@@ -648,18 +648,25 @@ export class TextLabelScope extends Desctructable {
     const isValidTextLabel = this.tempTextLabel!.isValidTextLabel();
     if ($e && !isValidTextLabel) {
       const { offsetX, offsetY } = $e;
-      this.labels!.forEach(label => {
-        if (label.isInside(offsetX, offsetY)) {
-          label.select();
-        }
-      });
+      const hitLabels: Array<TextLabel> = this.labels!.filter(label => label.isInside(offsetX, offsetY));
+      let hitIndex: number;
+      if (this.selectingLabel && (hitIndex = hitLabels.indexOf(this.selectingLabel)) > -1) {
+        this.selectingLabel = hitLabels[(hitIndex + 1) % hitLabels.length];
+      } else {
+        this.selectingLabel = hitLabels[0];
+      }
+      this.selectingLabel?.select();
       this.isLabeling = false;
     }
-    if ($e && !this.config.labelDirectory) {
+    if (!isValidTextLabel) {
+      this.tempTextLabel?.destruct();
+      this.tempTextLabel = null;
+    }
+    if ($e && !this.config.labelDirectory || !isValidTextLabel) {
       return;
     }
-    isValidTextLabel && this.labels!.push(this.tempTextLabel!);
-    if (this.config.onLabel && isValidTextLabel) {
+    this.labels!.push(this.tempTextLabel!);
+    if (this.config.onLabel) {
       this.config.onLabel({
         text: this.tempTextLabel!.getInnerText(),
         from: this.tempTextLabel!.getFrom(),
