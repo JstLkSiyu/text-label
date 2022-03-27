@@ -638,7 +638,11 @@ export class TextLabelScope extends Desctructable {
     this.isLabeling = true;
   }
   private handleEndLabel($e?: MouseEvent) {
-    if ($e && $e.button !== 0 || !this.isLabeling) {
+    if ($e && $e.button !== 0) {
+      return;
+    }
+    document.getSelection()?.removeAllRanges();
+    if (!this.isLabeling) {
       return;
     }
     const isValidTextLabel = this.tempTextLabel!.isValidTextLabel();
@@ -675,7 +679,6 @@ export class TextLabelScope extends Desctructable {
     this.selectingLabel!.select();
     this.tempTextLabel = null;
     this.isLabeling = false;
-    document.getSelection()?.removeAllRanges();
   }
   private handleLabel() {
     if (!this.isLabeling) {
