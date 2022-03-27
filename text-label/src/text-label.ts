@@ -237,14 +237,6 @@ class TextLabel extends Desctructable {
     Object.assign(this.config, config);
     this.initLabelDOM();
   }
-  private clearLabelLines() {
-    const cacheDOMs = Object.values(this.linesDOMCache!);
-    cacheDOMs.forEach(dom => {
-      this.labelDOM!.removeChild(dom);
-    });
-    this.linesDOMCache = {};
-    this.labelLines = [];
-  }
   private setLabelLines(lines: Array<LabelLine>) {
     const cacheKeys = new Set(Object.keys(this.linesDOMCache!));
     this.labelLines = lines;
@@ -349,12 +341,18 @@ class TextLabel extends Desctructable {
     );
   }
   private handleSelectStartDOM($e: MouseEvent) {
+    if ($e.button !== 0) {
+      return;
+    }
     $e.stopPropagation();
     this.isDraggingStartDOM = true;
     this.unselect();
     this.saveCurrentRange();
   }
   private handleSelectEndDOM($e: MouseEvent) {
+    if ($e.button !== 0) {
+      return;
+    }
     $e.stopPropagation();
     this.isDraggingEndDOM = true;
     this.unselect();
@@ -368,16 +366,21 @@ class TextLabel extends Desctructable {
     range.setEnd(endNode!, 0);
     this.tempRange = range;
   }
-  private handleDrag($e: Event) {
-    const selection = document.getSelection();
-    if (selection && (this.isDraggingEndDOM || this.isDraggingStartDOM)) {
+  private handleDrag() {
+    if (this.isDraggingEndDOM || this.isDraggingStartDOM) {
+      const selection = document.getSelection();
+      if (!selection) {
+        return;
+      }
       const { tempRange } = this;
       const range = selection.getRangeAt(0);
       if (tempRange && this.isDraggingEndDOM) {
         const { startIdx, endIdx, range: mergedRange } = this.mergeRange(range, tempRange, false);
-        this.setFrom(startIdx);
-        this.setTo(endIdx);
-        this.setRange(mergedRange);
+        if (startIdx >= 0 && endIdx >= 0) {
+          this.setFrom(startIdx);
+          this.setTo(endIdx);
+          this.setRange(mergedRange);
+        }
       } else if (tempRange && this.isDraggingStartDOM) {
         const { startIdx, endIdx, range: mergedRange } = this.mergeRange(range, tempRange, true);
         if (startIdx >= 0 && endIdx >= 0) {
@@ -396,19 +399,11 @@ class TextLabel extends Desctructable {
     const { index: fEndIdx } = this.nodeTrimToText(from.endContainer, texts, false);
     let startIdx: number, endIdx: number;
     if (draggingStart) {
-      endIdx = Math.max(fEndIdx, tEndIdx);
-      if (tEndIdx < fStartIdx) {
-        startIdx = tStartIdx;
-      } else {
-        startIdx = Math.min(tEndIdx, fEndIdx);
-      }
+      endIdx = Math.max(fEndIdx, tEndIdx) + 1;
+      startIdx = (tEndIdx < fStartIdx) ? tStartIdx : Math.min(tEndIdx, fEndIdx);
     } else {
       startIdx = Math.min(fStartIdx, tStartIdx);
-      if (tStartIdx > fEndIdx) {
-        endIdx = tEndIdx;
-      } else {
-        endIdx = Math.max(tStartIdx, fStartIdx);
-      }
+      endIdx = ((tStartIdx > fEndIdx) ? tEndIdx : Math.max(tStartIdx, fStartIdx)) + 1;
     }
     const range = new Range();
     texts[startIdx] && range.setStart(texts[startIdx], 0);
@@ -437,6 +432,9 @@ class TextLabel extends Desctructable {
     };
   }
   private handleDragEnd($e: MouseEvent) {
+    if ($e.button !== 0) {
+      return;
+    }
     if (this.isDraggingEndDOM || this.isDraggingStartDOM) {
       $e.preventDefault();
       document.getSelection()?.removeAllRanges();
