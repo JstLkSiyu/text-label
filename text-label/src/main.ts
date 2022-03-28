@@ -56,6 +56,16 @@ app.innerHTML = `
   hello world
   </b>
   </p>
+  <div>
+    <form name='color'>
+      <input type='radio' name='color' value='red' />
+      <span>red</span>
+      <input type='radio' name='color' value='green' />
+      <span>green</span>
+      <input type='radio' name='color' value='aqua' checked />
+      <span>aqua</span>
+    </form>
+  </div>
   <button id='label-btn'>click</button>
 `
 
@@ -77,3 +87,24 @@ const manager = inject ? new TextLabelScope(inject as HTMLElement, {
 labelBtn!.addEventListener('click', () => {
   manager!.label();
 });
+
+let currentColor = { r: 0, g: 210, b: 255 };
+
+const colorForm = app.querySelector('form[name="color"]');
+colorForm?.addEventListener('change', ($e: Event) => {
+  const value = ($e.target as HTMLInputElement)!.value;
+  switch (value) {
+    case 'red':
+      currentColor = { r: 255, g: 190, b: 170 };
+      break;
+    case 'green':
+      currentColor = { r: 0, g: 255, b: 210 };
+      break;
+    case 'aqua':
+      currentColor = { r: 0, g: 210, b: 255 };
+      break;
+    default:
+  }
+  manager?.useColor(currentColor);
+  manager?.getSelectingLabel()?.setColor(currentColor);
+})

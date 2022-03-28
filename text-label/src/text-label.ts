@@ -315,6 +315,11 @@ class TextLabel extends Desctructable {
         backgroundColor: this.getColorString()
       });
     });
+    this.selectStyledDOM!.forEach(selectStyleDOM => {
+      Object.assign(selectStyleDOM.style, {
+        backgroundColor: this.getColorString(1)
+      });
+    });
   }
   private getLineHeights() {
     return this.labelLines!.map(line => line.getHeight());
@@ -551,6 +556,18 @@ export class TextLabelScope extends Desctructable {
       return;
     }
     this.handleEndLabel();
+  }
+  getSelectingLabel() {
+    if (this.isDestructed) {
+      return null;
+    }
+    return this.selectingLabel;
+  }
+  useColor(color: Color) {
+    if (this.isDestructed) {
+      return;
+    }
+    this.config.color = color;
   }
   clearEnv() {
     this.destruct();
