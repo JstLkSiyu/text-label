@@ -633,12 +633,12 @@ export class TextLabelScope extends Desctructable {
     const hasLabelRootClass = this.root!.classList.contains('text-label-root');
     this.root!.classList.add('text-label-root');
     this.root!.appendChild(style);
-    this.root!.addEventListener('mousedown', this.handleStartLabel.bind(this));
+    this.root!.addEventListener('mousedown', this.handleStartLabel);
     this.addDestructCallback(
       () => {
         !hasLabelRootClass && this.root!.classList.remove('text-label-root');
         this.root!.removeChild(style);
-        this.root!.removeEventListener('mousedown', this.handleStartLabel.bind(this));
+        this.root!.removeEventListener('mousedown', this.handleStartLabel);
       }
     );
   }
