@@ -212,6 +212,17 @@ class TextLabel extends Desctructable {
     }
     return this.labelDOM;
   }
+  rerender() {
+    if (this.isDestructed) {
+      return;
+    }
+    const texts = this.source!.getSource(this.from, this.to);
+    const [firstText, lastText] = [texts.at(0), texts.at(-1)];
+    const range = new Range();
+    range.setStart(firstText!, 0);
+    range.setEnd(lastText!, 1);
+    this.setRange(range);
+  }
   constructor(
     root: HTMLElement,
     source: TextLabelScope,
@@ -561,6 +572,7 @@ export class TextLabelScope extends Desctructable {
     this.handleEndLabel = this.handleEndLabel.bind(this);
     this.handleLabel = this.handleLabel.bind(this);
     this.handleStartLabel = this.handleStartLabel.bind(this);
+    this.handleRerender = this.handleRerender.bind(this);
     this.root = dom;
     this.source = this.parseNode(dom);
     this.execDocumentEnv();
@@ -645,12 +657,41 @@ export class TextLabelScope extends Desctructable {
   private execDocumentEnv() {
     document.addEventListener('selectionchange', this.handleLabel);
     document.addEventListener('mouseup', this.handleEndLabel);
+    const trigger = this.addResizeListener(this.root!);
     this.addDestructCallback(
       () => {
         document.removeEventListener('selectionchange', this.handleLabel);
         document.removeEventListener('mouseup', this.handleEndLabel);
+        trigger.removeEventListener('resize', this.handleRerender);
       }
     );
+  }
+  private addResizeListener(dom: HTMLElement) {
+    const obj = document.createElement('object');
+    Object.assign(obj.style, {
+      display: 'block',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      overflow: 'hidden',
+      opacity: 0,
+      pointerEvent: 'none',
+      zIndex: -1,
+    });
+    obj.onload = () => {
+      if (obj.contentDocument?.defaultView) {
+        obj.contentDocument.defaultView.addEventListener('resize', this.handleRerender);
+      }
+    }
+    obj.type = 'text/html';
+    dom.appendChild(obj);
+    obj.data = 'about:blank';
+    return obj;
+  }
+  private handleRerender() {
+    this.labels!.forEach(label => label.rerender());
   }
   private handleStartLabel($e: MouseEvent) {
     if ($e.button !== 0) {
