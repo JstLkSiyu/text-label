@@ -65,6 +65,12 @@ const manager = inject ? new TextLabelScope(inject as HTMLElement, {
   onLabel: info => {
     console.log(info);
   },
+  onRelabel: info => {
+    console.log(info);
+  },
+  onSelect: info => {
+    console.log(info);
+  },
   labelDirectory: false
 }): null;
 

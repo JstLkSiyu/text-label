@@ -89,6 +89,7 @@ class LabelLine extends Desctructable {
 interface TextLabelConfig {
   color?: Color;
   opacity?: number;
+  onRelabel?: OnRelabel | null;
 }
 
 const DEFAULT_LABEL_COLOR: Color = {
@@ -106,6 +107,7 @@ class TextLabel extends Desctructable {
   private config: Required<TextLabelConfig> = {
     color: DEFAULT_LABEL_COLOR,
     opacity: 0.4,
+    onRelabel: null,
   };
   private labelDOM: HTMLDivElement | null = null;
   private root: HTMLElement | null = null;
@@ -225,6 +227,7 @@ class TextLabel extends Desctructable {
       this.labelLines = null;
       this.linesDOMCache = null;
       this.selectStyledDOM = null;
+      this.config.onRelabel = null;
     });
     this.handleSelectEndDOM = this.handleSelectEndDOM.bind(this);
     this.handleDrag = this.handleDrag.bind(this);
@@ -444,6 +447,13 @@ class TextLabel extends Desctructable {
       $e.preventDefault();
       document.getSelection()?.removeAllRanges();
       this.select();
+      this.config.onRelabel?.({
+        text: this.getInnerText(),
+        from: this.getFrom(),
+        to: this.getTo(),
+        length: this.getLength(),
+        label: this
+      });
     }
     this.isDraggingEndDOM = false;
     this.isDraggingStartDOM = false;
@@ -458,6 +468,8 @@ interface TextLabelScopeConfig {
   labelOpacity?: number;
   onLabel?: OnLabel | null;
   onStartLabel?: OnStartLabel | null;
+  onRelabel?: OnRelabel | null;
+  onSelect?: OnSelect | null;
   labelDirectory?: boolean;
 }
 
@@ -478,6 +490,14 @@ interface OnStartLabel {
   (): void;
 }
 
+interface OnRelabel {
+  (labelInfo: LabelInfo): void;
+}
+
+interface OnSelect {
+  (labelInfo: LabelInfo): void;
+}
+
 export class TextLabelScope extends Desctructable {
   private source: Array<Text> | null = [];
   private labels: Array<TextLabel> | null = [];
@@ -486,8 +506,10 @@ export class TextLabelScope extends Desctructable {
     color: DEFAULT_LABEL_COLOR,
     labelOpacity: 0.4,
     labelDirectory: true,
-    onLabel: () => {},
-    onStartLabel: () => {},
+    onLabel: null,
+    onStartLabel: null,
+    onSelect: null,
+    onRelabel: null,
   };
   private isLabeling: boolean = false;
   private tempTextLabel: TextLabel | null = null;
@@ -533,6 +555,8 @@ export class TextLabelScope extends Desctructable {
       this.labelsContainer = null;
       this.config.onLabel = null;
       this.config.onStartLabel = null;
+      this.config.onRelabel = null;
+      this.config.onSelect = null;
     });
     this.handleEndLabel = this.handleEndLabel.bind(this);
     this.handleLabel = this.handleLabel.bind(this);
@@ -637,8 +661,9 @@ export class TextLabelScope extends Desctructable {
       this.tempTextLabel = new TextLabel(this.labelsContainer!, this, {
         color: this.config.color,
         opacity: this.config.labelOpacity,
+        onRelabel: this.config.onRelabel,
       });
-      this.config.onStartLabel!();
+      this.config.onStartLabel?.();
     }
     this.isLabeling = true;
   }
@@ -660,7 +685,16 @@ export class TextLabelScope extends Desctructable {
       } else {
         this.selectingLabel = hitLabels[0];
       }
-      this.selectingLabel?.select();
+      if (this.selectingLabel) {
+        this.selectingLabel.select();
+        this.config.onSelect?.({
+          text: this.selectingLabel.getInnerText(),
+          from: this.selectingLabel.getFrom(),
+          to: this.selectingLabel.getTo(),
+          length: this.selectingLabel.getLength(),
+          label: this.selectingLabel
+        });
+      }
       this.isLabeling = false;
     }
     if (!isValidTextLabel) {
@@ -671,22 +705,20 @@ export class TextLabelScope extends Desctructable {
       return;
     }
     this.labels!.push(this.tempTextLabel!);
-    if (this.config.onLabel) {
-      this.config.onLabel({
-        text: this.tempTextLabel!.getInnerText(),
-        from: this.tempTextLabel!.getFrom(),
-        to: this.tempTextLabel!.getTo(),
-        length: this.tempTextLabel!.getLength(),
-        label: this.tempTextLabel!,
-        labels: this.labels!.map(label => ({
-          text: label.getInnerText(),
-          from: label.getFrom(),
-          to: label.getTo(),
-          length: label.getLength(),
-          label,
-        })),
-      });
-    }
+    this.config.onLabel?.({
+      text: this.tempTextLabel!.getInnerText(),
+      from: this.tempTextLabel!.getFrom(),
+      to: this.tempTextLabel!.getTo(),
+      length: this.tempTextLabel!.getLength(),
+      label: this.tempTextLabel!,
+      labels: this.labels!.map(label => ({
+        text: label.getInnerText(),
+        from: label.getFrom(),
+        to: label.getTo(),
+        length: label.getLength(),
+        label,
+      })),
+    });
     this.selectingLabel = this.tempTextLabel;
     this.selectingLabel!.select();
     this.tempTextLabel = null;
