@@ -302,16 +302,19 @@ class TextLabel extends Desctructable {
       });
     });
   }
+  private getLineHeights() {
+    return this.labelLines!.map(line => line.getHeight());
+  }
   private createSelectedDOM() {
+    const lineHeights = this.getLineHeights();
+    const [firstLineHeight, lastLineHeight] = [lineHeights.at(0), lineHeights.at(-1)];
     const startDOM = document.createElement('div');
     const endDOM = document.createElement('div');
     const publicStyle = {
       position: 'relative',
       display: 'inline-block',
       width: '2px',
-      height: 'calc(1em + 8px)',
       top: '0',
-      transform: 'translateY(4px)',
       marginRight: '-2px',
       marginTop: '-100%',
       backgroundColor: this.getColorString(1),
@@ -319,10 +322,12 @@ class TextLabel extends Desctructable {
       verticalAlign: 'text-bottom'
     };
     const startStyle = {
-      left: '-2px'
+      left: '-2px',
+      height: `${firstLineHeight}px`,
     };
     const endStyle = {
-      left: 0
+      left: 0,
+      height: `${lastLineHeight}px`,
     };
     startDOM.addEventListener('mousedown', this.handleSelectStartDOM, true);
     endDOM.addEventListener('mousedown', this.handleSelectEndDOM, true);
