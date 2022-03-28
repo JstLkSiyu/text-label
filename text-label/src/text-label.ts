@@ -662,7 +662,7 @@ export class TextLabelScope extends Desctructable {
       () => {
         document.removeEventListener('selectionchange', this.handleLabel);
         document.removeEventListener('mouseup', this.handleEndLabel);
-        trigger.removeEventListener('resize', this.handleRerender);
+        this.clearResizeListener(this.root!, trigger);
       }
     );
   }
@@ -690,8 +690,15 @@ export class TextLabelScope extends Desctructable {
     obj.data = 'about:blank';
     return obj;
   }
+  private clearResizeListener(dom: HTMLElement, trigger: HTMLObjectElement) {
+    trigger.removeEventListener('resize', this.handleRerender);
+    dom.removeChild(trigger);
+  }
   private handleRerender() {
     this.labels!.forEach(label => label.rerender());
+    if (this.isLabeling) {
+      this.tempTextLabel!.rerender();
+    }
   }
   private handleStartLabel($e: MouseEvent) {
     if ($e.button !== 0) {
