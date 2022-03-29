@@ -4,7 +4,7 @@ interface Color {
   b: number;
 }
 
-abstract class Desctructable {
+abstract class Destructable {
   private _isDestructed: boolean = false;
   protected get isDestructed() {
     return this._isDestructed;
@@ -29,7 +29,7 @@ abstract class Desctructable {
   }
 }
 
-class LabelLine extends Desctructable {
+class LabelLine extends Destructable {
   static compileRangeToLines(range: Range, baseLeft: number, baseTop: number): Array<LabelLine> {
     if (range.collapsed) {
       return [];
@@ -98,7 +98,7 @@ const DEFAULT_LABEL_COLOR: Color = {
 
 type SelectedStyledDOM = [HTMLDivElement, HTMLDivElement];
 
-class TextLabel extends Desctructable {
+export class TextLabel extends Destructable {
   private from: number;
   private to: number;
   private source: TextLabelScope | null = null;
@@ -479,7 +479,7 @@ class TextLabel extends Desctructable {
   }
 }
 
-interface TextLabelScopeConfig {
+export interface TextLabelScopeConfig {
   color?: Color;
   labelOpacity?: number;
   onLabel?: OnLabel | null;
@@ -514,7 +514,7 @@ interface OnSelect {
   (labelInfo: LabelInfo): void;
 }
 
-export class TextLabelScope extends Desctructable {
+export class TextLabelScope extends Destructable {
   private source: Array<Text> | null = [];
   private labels: Array<TextLabel> | null = [];
   private root: HTMLElement | null = null;

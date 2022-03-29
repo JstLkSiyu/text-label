@@ -9,5 +9,9 @@
   "devDependencies": {
     "typescript": "^4.3.2",
     "vite": "^2.6.4"
+  },
+  "dependencies": {
+    "@types/react": "^17.0.43",
+    "react": "^18.0.0"
   }
 }
