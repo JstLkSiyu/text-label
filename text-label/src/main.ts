@@ -81,7 +81,12 @@ const manager = inject ? new TextLabelScope(inject as HTMLElement, {
   onSelect: info => {
     console.log(info);
   },
-  labelDirectory: false
+  labelDirectory: false,
+  initValue: [{
+    color: { r: 255, g: 196, b: 203 },
+    from: 10,
+    to: 40
+  }]
 }): null;
 
 labelBtn!.addEventListener('click', () => {

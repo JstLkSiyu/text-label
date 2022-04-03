@@ -132,7 +132,10 @@ export class TextLabel extends Destructable {
     if (this.isDestructed) {
       return;
     }
-    const [startDOM, endDOM] = this.selectStyledDOM!;
+    if (!this.selectStyledDOM) {
+      return;
+    }
+    const [startDOM, endDOM] = this.selectStyledDOM;
     startDOM.replaceWith();
     endDOM.replaceWith();
     this.selected = false;
@@ -315,7 +318,7 @@ export class TextLabel extends Destructable {
         backgroundColor: this.getColorString()
       });
     });
-    this.selectStyledDOM!.forEach(selectStyleDOM => {
+    this.selectStyledDOM?.forEach(selectStyleDOM => {
       Object.assign(selectStyleDOM.style, {
         backgroundColor: this.getColorString(1)
       });
@@ -487,12 +490,21 @@ export interface TextLabelScopeConfig {
   onRelabel?: OnRelabel | null;
   onSelect?: OnSelect | null;
   labelDirectory?: boolean;
+  initValue?: Array<InitLabelInfo> | null;
 }
 
-interface LabelInfo {
-  text: string;
+interface BasicLabelInfo {
   from: number;
   to: number;
+}
+
+interface InitLabelInfo extends BasicLabelInfo {
+  color: Color;
+  opacity?: number;
+}
+
+interface LabelInfo extends BasicLabelInfo {
+  text: string;
   length: number;
   label: TextLabel;
   labels?: Array<LabelInfo>;
@@ -526,6 +538,7 @@ export class TextLabelScope extends Destructable {
     onStartLabel: null,
     onSelect: null,
     onRelabel: null,
+    initValue: null,
   };
   private isLabeling: boolean = false;
   private tempTextLabel: TextLabel | null = null;
@@ -585,6 +598,7 @@ export class TextLabelScope extends Destructable {
       this.config.onStartLabel = null;
       this.config.onRelabel = null;
       this.config.onSelect = null;
+      this.config.initValue = null;
     });
     this.handleEndLabel = this.handleEndLabel.bind(this);
     this.handleLabel = this.handleLabel.bind(this);
@@ -596,6 +610,32 @@ export class TextLabelScope extends Destructable {
     this.execRootEnv();
     this.initLabelsContainer();
     Object.assign(this.config, config);
+    this.handleInitValue();
+  }
+  private handleInitValue() {
+    const { initValue } = this.config;
+    if (!initValue) {
+      return;
+    }
+    initValue.forEach(labelInfo => {
+      const { color, opacity = this.config.labelOpacity, from, to } = labelInfo;
+      const textLabel = new TextLabel(this.labelsContainer!, this, {
+        color: this.config.color,
+        opacity: this.config.labelOpacity,
+        onRelabel: this.config.onRelabel,
+      });
+      const range = new Range();
+      const texts = this.getSource(from, to);
+      const [startNode, endNode] = [texts.at(0), texts.at(-1)];
+      range.setStart(startNode!, 0);
+      range.setEnd(endNode!, 0);
+      textLabel.setFrom(from);
+      textLabel.setTo(to);
+      textLabel.setRange(range);
+      textLabel.setColor(color);
+      textLabel.setOpacity(opacity);
+      this.labels!.push(textLabel);
+    });
   }
   private parseNode(node: Node): Array<Text> {
     const source: Array<Text> = [];
