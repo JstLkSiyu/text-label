@@ -93,23 +93,24 @@ labelBtn!.addEventListener('click', () => {
   manager!.label();
 });
 
-let currentColor = { r: 0, g: 210, b: 255 };
+type Color = {
+  r: number;
+  g: number;
+  b: number;
+};
+
+const colors: Record<string, Color> = {
+  red: { r: 255, g: 190, b: 170 },
+  green: { r: 0, g: 255, b: 210 },
+  aqua: { r: 0, g: 210, b: 255 },
+};
+
+let currentColor = colors['aqua'];
 
 const colorForm = app.querySelector('form[name="color"]');
 colorForm?.addEventListener('change', ($e: Event) => {
   const value = ($e.target as HTMLInputElement)!.value;
-  switch (value) {
-    case 'red':
-      currentColor = { r: 255, g: 190, b: 170 };
-      break;
-    case 'green':
-      currentColor = { r: 0, g: 255, b: 210 };
-      break;
-    case 'aqua':
-      currentColor = { r: 0, g: 210, b: 255 };
-      break;
-    default:
-  }
+  currentColor = colors[value];
   manager?.useColor(currentColor);
   manager?.getSelectingLabel()?.setColor(currentColor);
-})
+});

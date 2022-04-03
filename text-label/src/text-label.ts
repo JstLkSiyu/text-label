@@ -581,6 +581,9 @@ export class TextLabelScope extends Destructable {
       return;
     }
     this.config.color = color;
+    if (this.tempTextLabel) {
+      this.tempTextLabel.setColor(color);
+    }
   }
   clearEnv() {
     this.destruct();
