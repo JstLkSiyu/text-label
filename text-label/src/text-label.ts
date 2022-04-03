@@ -751,7 +751,9 @@ export class TextLabelScope extends Destructable {
     return obj;
   }
   private clearResizeListener(dom: HTMLElement, trigger: HTMLObjectElement) {
-    trigger.removeEventListener('resize', this.handleRerender);
+    if (trigger.contentDocument?.defaultView) {
+      trigger.contentDocument.defaultView.removeEventListener('resize', this.handleRerender);
+    }
     dom.removeChild(trigger);
   }
   private handleRerender() {
