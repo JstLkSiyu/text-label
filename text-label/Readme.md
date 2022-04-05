@@ -24,4 +24,4 @@ const scope = new TextLabelScope(text, {
 });
 ```
 
-![image-20220406014444567](.\images\Readme\image-20220406014444567.png)
+![image-20220406014444567](/images/Readme/image-20220406014444567.png)
