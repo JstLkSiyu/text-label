@@ -1,6 +1,7 @@
 {
   "name": "@siyu/text-label",
   "version": "0.0.0",
+  "description": "一个文本划词高亮工具",
   "repository": {
     "type": "git",
     "url": "https://github.com/JstLkSiyu/text-label"
