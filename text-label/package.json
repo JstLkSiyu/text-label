@@ -1,7 +1,6 @@
 {
-  "name": "text-label",
+  "name": "@siyu/text-label",
   "version": "0.0.0",
-  "description": "这是一个文本高亮标注器，绑定在某个文本标签上，可以为其提供高亮划词标注的能力",
   "repository": {
     "type": "git",
     "url": "https://github.com/JstLkSiyu/text-label"

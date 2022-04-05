@@ -24,3 +24,4 @@ const scope = new TextLabelScope(text, {
 });
 ```
 
+![image-20220406014444567](D:\Project\NodeJS\@siyu\text-label\text-label\images\Readme\image-20220406014444567.png)
