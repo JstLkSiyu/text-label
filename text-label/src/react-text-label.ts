@@ -1,4 +1,4 @@
-import { MutableRefObject, useCallback, useEffect, useMemo, useRef } from 'react';
+import { MutableRefObject, useCallback, useEffect, useRef } from 'react';
 import { TextLabel, TextLabelScope, TextLabelScopeConfig } from './text-label';
 
 type Color = {
