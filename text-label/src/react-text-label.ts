@@ -7,10 +7,12 @@ type Color = {
   b: number;
 };
 
-export const useTextLabel = (bindRef: MutableRefObject<HTMLElement>, initConfig?: TextLabelScopeConfig) => {
+export const useTextLabel = (bindRef: MutableRefObject<HTMLElement | null>, initConfig?: TextLabelScopeConfig) => {
   const scopeRef = useRef<TextLabelScope>();
   useEffect(() => {
-    scopeRef.current = new TextLabelScope(bindRef.current, initConfig ?? {});
+    if (bindRef.current) {
+      scopeRef.current = new TextLabelScope(bindRef.current, initConfig ?? {});
+    }
     return () => {
       scopeRef.current?.clearEnv();
       scopeRef.current = undefined;
