@@ -787,7 +787,10 @@ export class TextLabelScope extends Destructable {
     }
     const isValidTextLabel = this.tempTextLabel!.isValidTextLabel();
     if ($e && !isValidTextLabel) {
-      const { offsetX, offsetY } = $e;
+      const { clientX, clientY } = $e;
+      const { left: baseLeft, top: baseTop } = this.root!.getBoundingClientRect();
+      const offsetX = clientX - baseLeft;
+      const offsetY = clientY - baseTop;
       const hitLabels: Array<TextLabel> = this.labels!.filter(label => label.isInside(offsetX, offsetY));
       let hitIndex: number;
       if (this.selectingLabel && (hitIndex = hitLabels.indexOf(this.selectingLabel)) > -1) {
