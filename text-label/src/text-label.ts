@@ -766,6 +766,7 @@ export class TextLabelScope extends Destructable {
     if ($e.button !== 0) {
       return;
     }
+    this.clearSelection();
     this.labels!.forEach(label => label.unselect());
     if (!this.isLabeling) {
       this.tempTextLabel = new TextLabel(this.labelsContainer!, this, {
@@ -778,11 +779,7 @@ export class TextLabelScope extends Destructable {
     this.isLabeling = true;
   }
   private handleEndLabel($e?: MouseEvent) {
-    if ($e && $e.button !== 0) {
-      return;
-    }
-    document.getSelection()?.removeAllRanges();
-    if (!this.isLabeling) {
+    if ($e && $e.button !== 0 || !this.isLabeling) {
       return;
     }
     const isValidTextLabel = this.tempTextLabel!.isValidTextLabel();
@@ -868,6 +865,12 @@ export class TextLabelScope extends Destructable {
       textLabel.setFrom(startIndex!);
       textLabel.setTo(endIndex! + 1);
       textLabel.setRange(range);
+    }
+  }
+  private clearSelection() {
+    const selection = document.getSelection();
+    if (selection) {
+      selection.empty();
     }
   }
 }
