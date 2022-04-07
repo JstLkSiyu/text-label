@@ -508,12 +508,12 @@ interface BasicLabelInfo {
   to: number;
 }
 
-interface InitLabelInfo extends BasicLabelInfo {
+export interface InitLabelInfo extends BasicLabelInfo {
   color: Color;
   opacity?: number;
 }
 
-interface LabelInfo extends BasicLabelInfo {
+export interface LabelInfo extends BasicLabelInfo {
   text: string;
   length: number;
   label: TextLabel;

@@ -1,5 +1,5 @@
 import { MutableRefObject, useCallback, useEffect, useRef } from 'react';
-import { TextLabel, TextLabelScope, TextLabelScopeConfig } from './text-label';
+import { TextLabel, TextLabelScope, TextLabelScopeConfig, InitLabelInfo } from './text-label';
 
 type Color = {
   r: number;
@@ -35,11 +35,17 @@ export const useTextLabel = (bindRef: MutableRefObject<HTMLElement | null>, init
   const getTextLabels = useCallback(() => {
     return scopeRef.current?.getTextLabels() ?? [];
   }, []);
+  const createTextLabel = useCallback((labelInfo: InitLabelInfo) => {
+    return scopeRef.current?.createLabel(labelInfo) ?? null;
+  }, []);
+  const getScope = useCallback(() => scopeRef.current ?? null, []);
   return {
     doLabel,
     deleteLabel,
     setColor,
     getSelectingLabel,
     getTextLabels,
+    createTextLabel,
+    getScope,
   };
 }
