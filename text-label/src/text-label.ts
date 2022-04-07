@@ -215,6 +215,18 @@ export class TextLabel extends Destructable {
     }
     return this.labelDOM;
   }
+  getLabelInfo() {
+    if (this.isDestructed) {
+      return null;
+    }
+    return {
+      from: this.from,
+      to: this.to,
+      text: this.getInnerText(),
+      length: this.getLength(),
+      label: this,
+    } as LabelInfo;
+  }
   rerender() {
     if (this.isDestructed) {
       return;
@@ -466,13 +478,7 @@ export class TextLabel extends Destructable {
       $e.preventDefault();
       document.getSelection()?.removeAllRanges();
       this.select();
-      this.config.onRelabel?.({
-        text: this.getInnerText(),
-        from: this.getFrom(),
-        to: this.getTo(),
-        length: this.getLength(),
-        label: this
-      });
+      this.config.onRelabel?.(this.getLabelInfo()!);
     }
     this.isDraggingEndDOM = false;
     this.isDraggingStartDOM = false;
@@ -489,6 +495,8 @@ export interface TextLabelScopeConfig {
   onStartLabel?: OnStartLabel | null;
   onRelabel?: OnRelabel | null;
   onSelect?: OnSelect | null;
+  onHover?: OnHover | null;
+  onDeleteLabel?: OnDeleteLabel | null;
   labelDirectory?: boolean;
   initValue?: Array<InitLabelInfo> | null;
 }
@@ -526,6 +534,14 @@ interface OnSelect {
   (labelInfo: LabelInfo): void;
 }
 
+interface OnHover {
+  (labelInfo: LabelInfo): void;
+}
+
+interface OnDeleteLabel {
+  (labelInfo: LabelInfo): void;
+}
+
 export class TextLabelScope extends Destructable {
   private source: Array<Text> | null = [];
   private labels: Array<TextLabel> | null = [];
@@ -538,12 +554,15 @@ export class TextLabelScope extends Destructable {
     onStartLabel: null,
     onSelect: null,
     onRelabel: null,
+    onHover: null,
+    onDeleteLabel: null,
     initValue: null,
   };
   private isLabeling: boolean = false;
   private tempTextLabel: TextLabel | null = null;
   private labelsContainer: HTMLDivElement | null = null;
   private selectingLabel: TextLabel | null = null;
+  private hoveringLabel: TextLabel | null = null;
   getText(from: number, to: number) {
     if (this.isDestructed) {
       return '';
@@ -561,14 +580,24 @@ export class TextLabelScope extends Destructable {
       return;
     }
     const index = this.labels!.indexOf(label);
-    label.destruct();
     this.labels!.splice(index, 1);
+    this.config.onDeleteLabel?.({
+      ...label.getLabelInfo()!,
+      labels: this.labels!.map(label => label.getLabelInfo()!)
+    });
+    label.destruct();
   }
   label() {
     if (this.isDestructed) {
       return;
     }
     this.handleEndLabel();
+  }
+  getTextLabels() {
+    if (this.isDestructed) {
+      return [];
+    }
+    return [...this.labels ?? []];
   }
   getSelectingLabel() {
     if (this.isDestructed) {
@@ -596,17 +625,20 @@ export class TextLabelScope extends Destructable {
       this.root = null;
       this.tempTextLabel = null;
       this.selectingLabel = null;
+      this.hoveringLabel = null;
       this.labelsContainer = null;
       this.config.onLabel = null;
       this.config.onStartLabel = null;
       this.config.onRelabel = null;
       this.config.onSelect = null;
+      this.config.onHover = null;
       this.config.initValue = null;
     });
     this.handleEndLabel = this.handleEndLabel.bind(this);
     this.handleLabel = this.handleLabel.bind(this);
     this.handleStartLabel = this.handleStartLabel.bind(this);
     this.handleRerender = this.handleRerender.bind(this);
+    this.handleFindHover = this.handleFindHover.bind(this);
     this.root = dom;
     this.source = this.parseNode(dom);
     this.execDocumentEnv();
@@ -706,11 +738,13 @@ export class TextLabelScope extends Destructable {
     this.root!.classList.add('text-label-root');
     this.root!.appendChild(style);
     this.root!.addEventListener('mousedown', this.handleStartLabel);
+    this.root!.addEventListener('mousemove', this.handleFindHover);
     this.addDestructCallback(
       () => {
         !hasLabelRootClass && this.root!.classList.remove('text-label-root');
         this.root!.removeChild(style);
         this.root!.removeEventListener('mousedown', this.handleStartLabel);
+        this.root!.removeEventListener('mousemove', this.handleFindHover);
       }
     );
   }
@@ -762,6 +796,23 @@ export class TextLabelScope extends Destructable {
       this.tempTextLabel!.rerender();
     }
   }
+  private handleFindHover($e: MouseEvent) {
+    const { clientX, clientY } = $e;
+    const { left: baseLeft, top: baseTop } = this.root!.getBoundingClientRect();
+    const offsetX = clientX - baseLeft;
+    const offsetY = clientY - baseTop;
+    let targetLabel = this.selectingLabel?.isInside(offsetX, offsetY) ? this.selectingLabel : null;
+    targetLabel || (targetLabel = this.labels!.reduce((target: TextLabel | null, label) => {
+      if (target === null && label !== this.selectingLabel && label.isInside(offsetX, offsetY)) {
+        return label;
+      }
+      return target;
+    }, null));
+    if (this.hoveringLabel !== targetLabel && targetLabel !== null) {
+      this.config.onHover?.(targetLabel.getLabelInfo()!)
+    }
+    this.hoveringLabel = targetLabel;
+  }
   private handleStartLabel($e: MouseEvent) {
     if ($e.button !== 0) {
       return;
@@ -797,13 +848,7 @@ export class TextLabelScope extends Destructable {
       }
       if (this.selectingLabel) {
         this.selectingLabel.select();
-        this.config.onSelect?.({
-          text: this.selectingLabel.getInnerText(),
-          from: this.selectingLabel.getFrom(),
-          to: this.selectingLabel.getTo(),
-          length: this.selectingLabel.getLength(),
-          label: this.selectingLabel
-        });
+        this.config.onSelect?.(this.selectingLabel.getLabelInfo()!);
       }
       this.isLabeling = false;
     }
@@ -816,18 +861,8 @@ export class TextLabelScope extends Destructable {
     }
     this.labels!.push(this.tempTextLabel!);
     this.config.onLabel?.({
-      text: this.tempTextLabel!.getInnerText(),
-      from: this.tempTextLabel!.getFrom(),
-      to: this.tempTextLabel!.getTo(),
-      length: this.tempTextLabel!.getLength(),
-      label: this.tempTextLabel!,
-      labels: this.labels!.map(label => ({
-        text: label.getInnerText(),
-        from: label.getFrom(),
-        to: label.getTo(),
-        length: label.getLength(),
-        label,
-      })),
+      ...this.tempTextLabel!.getLabelInfo()!,
+      labels: this.labels!.map(label => label.getLabelInfo()!),
     });
     this.selectingLabel = this.tempTextLabel;
     this.selectingLabel!.select();

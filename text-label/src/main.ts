@@ -47,14 +47,18 @@ const inject = app.querySelector('#inject');
 const labelBtn = app.querySelector('#label-btn');
 const manager = inject ? new TextLabelScope(inject as HTMLElement, {
   onLabel: info => {
-    console.log(info);
+    console.log('label', info);
   },
   onRelabel: info => {
-    console.log(info);
+    console.log('relabel', info);
   },
   onSelect: info => {
-    console.log(info);
+    console.log('select', info);
   },
+  onHover: info => {
+    console.log('hover', info);
+  },
+
   labelDirectory: false,
   initValue: [{
     color: { r: 255, g: 196, b: 203 },

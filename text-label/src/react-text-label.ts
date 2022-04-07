@@ -32,10 +32,14 @@ export const useTextLabel = (bindRef: MutableRefObject<HTMLElement | null>, init
   const getSelectingLabel = useCallback(() => {
     return scopeRef.current?.getSelectingLabel() ?? null;
   }, []);
+  const getTextLabels = useCallback(() => {
+    return scopeRef.current?.getTextLabels() ?? [];
+  }, []);
   return {
     doLabel,
     deleteLabel,
     setColor,
     getSelectingLabel,
+    getTextLabels,
   };
 }
