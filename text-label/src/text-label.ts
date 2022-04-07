@@ -597,9 +597,9 @@ export class TextLabelScope extends Destructable {
   }
   createLabel(labelInfo: InitLabelInfo) {
     if (this.isDestructed) {
-      return;
+      return null;
     }
-    this.addLabel(labelInfo);
+    return this.addLabel(labelInfo);
   }
   getTextLabels() {
     if (this.isDestructed) {
@@ -680,6 +680,7 @@ export class TextLabelScope extends Destructable {
     textLabel.setColor(color);
     textLabel.setOpacity(opacity);
     this.labels!.push(textLabel);
+    return textLabel;
   }
   private parseNode(node: Node): Array<Text> {
     const source: Array<Text> = [];
