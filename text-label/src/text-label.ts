@@ -595,6 +595,12 @@ export class TextLabelScope extends Destructable {
     }
     this.handleEndLabel();
   }
+  createLabel(labelInfo: InitLabelInfo) {
+    if (this.isDestructed) {
+      return;
+    }
+    this.addLabel(labelInfo);
+  }
   getTextLabels() {
     if (this.isDestructed) {
       return [];
@@ -654,25 +660,26 @@ export class TextLabelScope extends Destructable {
     if (!initValue) {
       return;
     }
-    initValue.forEach(labelInfo => {
-      const { color, opacity = this.config.labelOpacity, from, to } = labelInfo;
-      const textLabel = new TextLabel(this.labelsContainer!, this, {
-        color: this.config.color,
-        opacity: this.config.labelOpacity,
-        onRelabel: this.config.onRelabel,
-      });
-      const range = new Range();
-      const texts = this.getSource(from, to);
-      const [startNode, endNode] = [texts.at(0), texts.at(-1)];
-      range.setStart(startNode!, 0);
-      range.setEnd(endNode!, 0);
-      textLabel.setFrom(from);
-      textLabel.setTo(to);
-      textLabel.setRange(range);
-      textLabel.setColor(color);
-      textLabel.setOpacity(opacity);
-      this.labels!.push(textLabel);
+    initValue.forEach(labelInfo => this.addLabel(labelInfo));
+  }
+  private addLabel(labelInfo: InitLabelInfo) {
+    const { color, opacity = this.config.labelOpacity, from, to } = labelInfo;
+    const textLabel = new TextLabel(this.labelsContainer!, this, {
+      color: this.config.color,
+      opacity: this.config.labelOpacity,
+      onRelabel: this.config.onRelabel,
     });
+    const range = new Range();
+    const texts = this.getSource(from, to);
+    const [startNode, endNode] = [texts.at(0), texts.at(-1)];
+    range.setStart(startNode!, 0);
+    range.setEnd(endNode!, 0);
+    textLabel.setFrom(from);
+    textLabel.setTo(to);
+    textLabel.setRange(range);
+    textLabel.setColor(color);
+    textLabel.setOpacity(opacity);
+    this.labels!.push(textLabel);
   }
   private parseNode(node: Node): Array<Text> {
     const source: Array<Text> = [];
