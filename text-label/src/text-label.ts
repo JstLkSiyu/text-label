@@ -1,3 +1,5 @@
+import { throttle } from 'lodash';
+
 interface Color {
   r: number;
   g: number;
@@ -638,7 +640,7 @@ export class TextLabelScope extends Destructable {
     this.handleLabel = this.handleLabel.bind(this);
     this.handleStartLabel = this.handleStartLabel.bind(this);
     this.handleRerender = this.handleRerender.bind(this);
-    this.handleFindHover = this.handleFindHover.bind(this);
+    this.handleFindHover = throttle(this.handleFindHover.bind(this), 100);
     this.root = dom;
     this.source = this.parseNode(dom);
     this.execDocumentEnv();

@@ -1,6 +1,6 @@
 {
   "name": "@siyu/text-label",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "一个文本划词高亮工具",
   "repository": {
     "type": "git",
@@ -10,8 +10,15 @@
   "bugs": {
     "url": "https://github.com/JstLkSiyu/text-label/issues"
   },
-  "files": ["dist"],
-  "keywords": ["text", "label", "hightlight", "react"],
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "text",
+    "label",
+    "hightlight",
+    "react"
+  ],
   "main": "dist/index.js",
   "scripts": {
     "dev": "vite",
@@ -19,13 +26,15 @@
     "serve": "vite preview"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.181",
+    "@types/react": "^17.0.43",
     "rollup": "^2.70.1",
     "rollup-plugin-typescript2": "^0.31.2",
     "typescript": "^4.3.2",
     "vite": "^2.6.4"
   },
   "dependencies": {
-    "@types/react": "^17.0.43",
+    "lodash": "^4.17.21",
     "react": "^18.0.0"
   }
 }

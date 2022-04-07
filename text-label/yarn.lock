@@ -10,10 +10,8 @@
     "estree-walker" "^2.0.1"
     "picomatch" "^2.2.2"
 
-"@types/node@*":
-  "integrity" "sha512-UxDxWn7dl97rKVeVS61vErvw086aCYhDLyvRQZ5Rk65rZKepaFdm53GeqXaKBuOhED4e9uWq34IC3TdSdJJ2Gw=="
-  "resolved" "https://registry.npmmirror.com/@types/node/-/node-17.0.23.tgz"
-  "version" "17.0.23"
+"@types/lodash@^4.14.181":
+  "version" "4.14.181"
 
 "@types/prop-types@*":
   "integrity" "sha512-rZ5drC/jWjrArrS8BR6SIr4cWpW09RNTYt9AMZo3Jwwif+iacXAqgVjm0B0Bv/S1jhDXKHqRVNCbACkJ89RAnQ=="
@@ -53,9 +51,7 @@
   "resolved" "https://registry.npmmirror.com/csstype/-/csstype-3.0.11.tgz"
   "version" "3.0.11"
 
-"esbuild-windows-64@0.14.27":
-  "integrity" "sha512-b3y3vTSl5aEhWHK66ngtiS/c6byLf6y/ZBvODH1YkBM+MGtVL6jN38FdHUsZasCz9gFwYs/lJMVY9u7GL6wfYg=="
-  "resolved" "https://registry.npmmirror.com/esbuild-windows-64/-/esbuild-windows-64-0.14.27.tgz"
+"esbuild-darwin-64@0.14.27":
   "version" "0.14.27"
 
 "esbuild@^0.14.14":
@@ -123,6 +119,9 @@
     "jsonfile" "^6.0.1"
     "universalify" "^2.0.0"
 
+"fsevents@~2.3.2":
+  "version" "2.3.2"
+
 "function-bind@^1.1.1":
   "integrity" "sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A=="
   "resolved" "https://registry.npmmirror.com/function-bind/-/function-bind-1.1.1.tgz"
@@ -174,6 +173,9 @@
   "version" "6.0.0"
   dependencies:
     "p-locate" "^5.0.0"
+
+"lodash@^4.17.21":
+  "version" "4.17.21"
 
 "loose-envify@^1.1.0":
   "integrity" "sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q=="
