@@ -7,7 +7,7 @@ app.innerHTML = `
   <h1>Hello Text Label!</h1>
   <div id='inject' style='text-align: center'>
   <h3>@siyu/text-label</h3>
-  <p>这是一个为文本标签提供划词高亮能力的组件，支持react</p>
+  <p>这是一个为文本标签提供划词高亮能力的组件，支持react😄😄</p>
   <pre style='text-align: left; display: inline-block'>
   const text = document.getElementById("text");
   const scope = new TextLabelScope(text, {
@@ -59,7 +59,7 @@ const manager = inject ? new TextLabelScope(inject as HTMLElement, {
     console.log('hover', info);
   },
 
-  labelDirectory: false,
+  labelDirectory: true,
   initValue: [{
     color: { r: 255, g: 196, b: 203 },
     from: 10,

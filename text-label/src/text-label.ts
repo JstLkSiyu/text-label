@@ -704,8 +704,10 @@ export class TextLabelScope extends Destructable {
       return [node];
     } else {
       const nodes: Array<Text> = [];
-      while (node.length > 1) {
-        nodes.push(node.splitText(node.length - 1));
+      const texts = [...(node.textContent ?? '')];
+      while (texts.length > 1) {
+        const text = texts.pop()!;
+        nodes.push(node.splitText(node.length - text.length));
       }
       return nodes.reverse();
     }
