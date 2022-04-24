@@ -152,6 +152,8 @@ export class TextLabel extends Destructable {
     const sourceTexts = this.source!.getSource(this.from, this.to);
     const [startText, endText] = [sourceTexts.at(0), sourceTexts.at(-1)];
     const [startDOM, endDOM] = this.selectStyledDOM!;
+    console.log(sourceTexts);
+    
     startText?.replaceWith(startDOM, startText!);
     endText?.replaceWith(endText!, endDOM);
     this.selected = true;
@@ -679,6 +681,8 @@ export class TextLabelScope extends Destructable {
     textLabel.setRange(range);
     textLabel.setColor(color);
     textLabel.setOpacity(opacity);
+    console.log(this.getSource(from, to));
+    
     this.labels!.push(textLabel);
     return textLabel;
   }
@@ -705,7 +709,7 @@ export class TextLabelScope extends Destructable {
     } else {
       const nodes: Array<Text> = [];
       const texts = [...(node.textContent ?? '')];
-      while (texts.length > 1) {
+      while (texts.length > 0) {
         const text = texts.pop()!;
         nodes.push(node.splitText(node.length - text.length));
       }
@@ -738,6 +742,7 @@ export class TextLabelScope extends Destructable {
     style.innerHTML = `
       .text-label-root {
         position: relative;
+        z-index: 0;
       }
       .text-label-root::selection {
         background: none;
@@ -842,7 +847,11 @@ export class TextLabelScope extends Destructable {
     this.isLabeling = true;
   }
   private handleEndLabel($e?: MouseEvent) {
-    if ($e && $e.button !== 0 || !this.isLabeling) {
+    if ($e && $e.button !== 0) {
+      return;
+    }
+    if (!this.isLabeling) {
+      document.getSelection()?.removeAllRanges();
       return;
     }
     const isValidTextLabel = this.tempTextLabel!.isValidTextLabel();

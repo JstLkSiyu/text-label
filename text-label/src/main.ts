@@ -62,7 +62,7 @@ const manager = inject ? new TextLabelScope(inject as HTMLElement, {
   labelDirectory: true,
   initValue: [{
     color: { r: 255, g: 196, b: 203 },
-    from: 10,
+    from: 16,
     to: 40
   }]
 }): null;
